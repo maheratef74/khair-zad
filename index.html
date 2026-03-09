@@ -380,20 +380,20 @@
       position: relative;
       width: 85px;
       height: 85px;
-      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 6px;
-      background: conic-gradient(var(--progress-color) calc(var(--score-pct) * 1%), #e6ede9 0);
     }
 
     .score-circle::before {
       content: '';
       position: absolute;
-      inset: 4px;
-      background: var(--off-white);
+      inset: 0;
       border-radius: 50%;
+      background: conic-gradient(var(--progress-color, var(--green-mid)) calc(var(--score-pct) * 1%), var(--circle-empty, #e6ede9) 0);
+      -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 5px), black calc(100% - 4px));
+      mask: radial-gradient(closest-side, transparent calc(100% - 5px), black calc(100% - 4px));
       z-index: 0;
     }
 
@@ -424,7 +424,10 @@
 
     /* Grade cards specifically */
     .contestant-card.grade-card {
-      padding: 20px 16px;
+      --progress-color: #dab03c;
+      --circle-empty: rgba(255, 255, 255, 0.08);
+
+      padding: 24px 16px 20px;
       justify-content: center;
       background: var(--card-bg);
       backdrop-filter: blur(10px);
@@ -574,7 +577,7 @@
     }
 
     .footer-brand {
-      font-size: 0.88rem;
+      font-size: 0.75rem;
       color: var(--gold-pale);
       opacity: 0.75;
     }
@@ -652,7 +655,10 @@
   <!-- FOOTER -->
   <footer class="site-footer">
     <p class="footer-quran">﴿ وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ ﴾</p>
-    <p class="footer-brand">تصميم وبرمجة: <a href="https://www.facebook.com/" target="_blank">ماهر عاطف</a> المبرمج</p>
+    <p class="footer-brand">تم تطوير الموقع بواسطة: <a href="https://www.facebook.com/" target="_blank"> مهندس / ماهر
+        عاطف اللبيدي </a><br>
+      <span style="font-size: 1.5em; opacity: 0.9;"> 01205397285</span>
+    </p>
   </footer>
 
   <script>
@@ -680,14 +686,19 @@
 
     function getCardRankClass(rank) {
       const r = String(rank).trim();
-      if (r === '1') return 'rank-1';
-      if (r === '2') return 'rank-2';
-      if (r === '3') return 'rank-3';
+      if (r === '1' || r === 'الأول' || r === 'الأول مكرر') return 'rank-1';
+      if (r === '2' || r === 'الثاني' || r === 'الثاني مكرر') return 'rank-2';
+      if (r === '3' || r === 'الثالث' || r === 'الثالث مكرر') return 'rank-3';
       return '';
     }
 
     function getRankLabel(rank) {
       const r = String(rank).trim();
+      // If it's already a full Arabic text (like 'الأول', 'الرابع مكرر', etc.), use it directly
+      if (/[\u0600-\u06FF]/.test(r)) {
+        return r.startsWith('المركز') ? r : `المركز ${r}`;
+      }
+
       const ordinals = { '1': 'الأول', '2': 'الثاني', '3': 'الثالث', '4': 'الرابع', '5': 'الخامس' };
       return ordinals[r] ? `المركز ${ordinals[r]}` : `المركز ${r}`;
     }
@@ -704,21 +715,28 @@
       const score = sanitize(contestant.score);
       const rank = sanitize(contestant.rank);
 
+      const scoreVal = parseFloat(score) || 0;
+      const scorePct = Math.min(Math.max(scoreVal, 0), 100);
+
       if (isGradeGroup) {
         // Grades card
         const gradeKey = rank.replace(/\s+/g, '_');
         return `
-          <div class="contestant-card grade-card">
+          <div class="contestant-card grade-card" style="--score-pct: ${scorePct};">
             <span class="grade-chip ${gradeKey}">${rank}</span>
             <p class="card-name">${name}</p>
-            <span class="card-score">الدرجة: ${score}</span>
+            <div class="score-circle" style="margin-top: 8px;">
+              <span class="score-val">${score}</span>
+            </div>
+            <p class="score-label" style="color: rgba(255, 255, 255, 0.4); margin-bottom: 0;">الدرجة</p>
           </div>`;
       } else {
         // Ranked card
         const cardClass = getCardRankClass(rank);
 
-        let iconHTML = `<div class="rank-badge">${rank}</div>`;
-        if (rank === '1') {
+        const rClean = String(rank).trim();
+        let iconHTML = '';
+        if (rClean === '1' || rClean === 'الأول' || rClean === 'الأول مكرر') {
           iconHTML = `
              <div class="rank-badge">
                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -727,7 +745,7 @@
                  <path d="M18 3h3v4c0 2.2-1.8 4-4 4v-8z"></path>
                </svg>
              </div>`;
-        } else if (rank === '2') {
+        } else if (rClean === '2' || rClean === 'الثاني' || rClean === 'الثاني مكرر') {
           iconHTML = `
              <div class="rank-badge">
                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -735,7 +753,7 @@
                  <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
                </svg>
              </div>`;
-        } else if (rank === '3') {
+        } else if (rClean === '3' || rClean === 'الثالث' || rClean === 'الثالث مكرر') {
           iconHTML = `
              <div class="rank-badge">
                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -745,30 +763,33 @@
              </div>`;
         }
 
-        const scoreVal = parseFloat(score) || 0;
-        const scorePct = Math.min(Math.max(scoreVal, 0), 100);
-
         return `
-          <div class="contestant-card ranked-card ${cardClass}" style="--score-pct: ${scorePct};">
-            ${iconHTML}
-            <div class="card-top-row">
-              <p class="card-name">${name}</p>
-            </div>
-            <div class="score-circle">
-              <span class="score-val">${score}</span>
-            </div>
-            <p class="score-label">الدرجة</p>
-            <div class="position-pill">${getRankLabel(rank)}</div>
-          </div>`;
+            <div class="contestant-card ranked-card ${cardClass}" style="--score-pct: ${scorePct};">
+              ${iconHTML}
+              <div class="card-top-row">
+                <p class="card-name">${name}</p>
+              </div>
+              <div class="score-circle">
+                <span class="score-val">${score}</span>
+              </div>
+              <p class="score-label">الدرجة</p>
+              <div class="position-pill">${getRankLabel(rank)}</div>
+            </div>`;
       }
     }
+
 
     /* ============================================================
        BUILD CATEGORY SECTION HTML
     ============================================================ */
     function buildCategorySection(categoryName, contestants, index) {
-      const ranked = contestants.filter(c => !isGrade(c.rank));
-      const graded = contestants.filter(c => isGrade(c.rank));
+      const validContestants = contestants.filter(c => {
+        const r = String(c.rank || '').trim();
+        return r !== 'راسب';
+      });
+
+      const ranked = validContestants.filter(c => !isGrade(c.rank));
+      const graded = validContestants.filter(c => isGrade(c.rank));
 
       const hasRanked = ranked.length > 0;
       const hasGraded = graded.length > 0;
