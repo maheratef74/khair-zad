@@ -714,11 +714,13 @@
     function buildCard(contestant, isGradeGroup) {
       const name = sanitize(contestant.name);
       const score = sanitize(contestant.score);
-      let rank = sanitize(contestant.rank);
+      const originalRank = sanitize(contestant.rank);
       const note = sanitize(contestant.note);
 
+      let rankDisplay = originalRank;
+
       if (note === 'تشجيعيه' || note === 'تشجيعية') {
-        rank = 'جائزة تشجيعية';
+        rankDisplay = `${originalRank} - جائزة تشجيعية`;
       }
 
       const scoreVal = parseFloat(score) || 0;
@@ -726,10 +728,12 @@
 
       if (isGradeGroup) {
         // Grades card
-        const gradeKey = rank.replace(/\s+/g, '_');
+        const gradeKey = 'جائزة_تشجيعية'; // Always use this chip style if it's an encouragement award, or fallback to the rank
+        const cssClass = (note === 'تشجيعيه' || note === 'تشجيعية') ? 'جائزة_تشجيعية' : originalRank.replace(/\s+/g, '_');
+
         return `
           <div class="contestant-card grade-card" style="--score-pct: ${scorePct};">
-            <span class="grade-chip ${gradeKey}">${rank}</span>
+            <span class="grade-chip ${cssClass}">${rankDisplay}</span>
             <p class="card-name">${name}</p>
             <div class="score-circle" style="margin-top: 8px;">
               <span class="score-val">${score}</span>
@@ -738,9 +742,9 @@
           </div>`;
       } else {
         // Ranked card
-        const cardClass = getCardRankClass(rank);
+        const cardClass = getCardRankClass(originalRank);
 
-        const rClean = String(rank).trim();
+        const rClean = String(originalRank).trim();
         let iconHTML = '';
         if (rClean === '1' || rClean === 'الأول' || rClean === 'الأول مكرر') {
           iconHTML = `
@@ -779,7 +783,7 @@
                 <span class="score-val">${score}</span>
               </div>
               <p class="score-label">الدرجة</p>
-              <div class="position-pill">${getRankLabel(rank)}</div>
+              <div class="position-pill">${getRankLabel(originalRank)}</div>
             </div>`;
       }
     }
@@ -799,6 +803,10 @@
 
       const hasRanked = ranked.length > 0;
       const hasGraded = graded.length > 0;
+
+      if (!hasRanked && !hasGraded) {
+        return '';
+      }
 
       const rankedCardsHTML = hasRanked
         ? ranked.map(c => buildCard(c, false)).join('')
