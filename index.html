@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>نتائج مسابقة حفظ القرآن الكريم</title>
+  <meta name="description" content="نتائج مسابقة حفظ القرآن الكريم – عرض شرفي للمتسابقين المتميزين في مختلف الفئات" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    /* ============================
+       CSS VARIABLES & RESET
+    ============================ */
+    :root {
+      --green-darkest: #0a1f0e;
+      --green-dark: #0d2b14;
+      --green-mid: #145a28;
+      --green-light: #1e7a3a;
+      --gold: #c9a227;
+      --gold-light: #e8c55a;
+      --gold-pale: #f5e29a;
+      --white: #ffffff;
+      --off-white: #f8f5ec;
+      --text-dark: #111810;
+      --text-muted: #4a6050;
+      --card-bg: rgba(255, 255, 255, 0.07);
+      --card-border: rgba(201, 162, 39, 0.25);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --transition: 0.3s ease;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Cairo', 'Tajawal', sans-serif;
+      background: var(--green-darkest);
+      color: var(--white);
+      min-height: 100vh;
+      direction: rtl;
+      overflow-x: hidden;
+    }
+
+    /* ============================
+       BACKGROUND PATTERN
+    ============================ */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(30, 122, 58, 0.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 90%, rgba(201, 162, 39, 0.12) 0%, transparent 50%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 5 L35 20 L50 20 L38 30 L43 45 L30 36 L17 45 L22 30 L10 20 L25 20 Z' fill='none' stroke='rgba(201,162,39,0.05)' stroke-width='1'/%3E%3C/svg%3E");
+      background-size: auto, auto, 80px 80px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ============================
+       HEADER / HERO
+    ============================ */
+    .site-header {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 60px 20px 50px;
+      background: linear-gradient(180deg, rgba(10, 31, 14, 0.9) 0%, transparent 100%);
+    }
+
+    .header-badge {
+      display: inline-block;
+      font-size: 2.4rem;
+      line-height: 1;
+      margin-bottom: 18px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .site-header h1 {
+      font-size: clamp(1.6rem, 5vw, 3rem);
+      font-weight: 900;
+      color: var(--gold-light);
+      text-shadow: 0 0 30px rgba(201, 162, 39, 0.4), 0 2px 8px rgba(0, 0, 0, 0.5);
+      letter-spacing: 0.5px;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .site-header .subtitle {
+      font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+      color: rgba(255, 255, 255, 0.65);
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      justify-content: center;
+      margin: 30px auto;
+      max-width: 480px;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to left, transparent, var(--gold), transparent);
+    }
+
+    .divider-icon {
+      color: var(--gold);
+      font-size: 1.3rem;
+    }
+
+    /* ============================
+       MAIN CONTENT
+    ============================ */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    /* ============================
+       LOADING / ERROR STATES
+    ============================ */
+    #status-container {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .spinner {
+      width: 56px;
+      height: 56px;
+      border: 4px solid rgba(201, 162, 39, 0.2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      animation: spin 0.85s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #status-container p {
+      color: var(--gold-light);
+      font-size: 1.1rem;
+    }
+
+    .error-box {
+      background: rgba(180, 30, 30, 0.2);
+      border: 1px solid rgba(220, 80, 80, 0.4);
+      border-radius: var(--radius-sm);
+      padding: 20px 28px;
+      color: #f4a4a4;
+      font-size: 1rem;
+    }
+
+    /* ============================
+       CATEGORY SECTION
+    ============================ */
+    .category-section {
+      margin-bottom: 56px;
+      animation: fadeInUp 0.6s ease both;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .category-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(201, 162, 39, 0.35);
+    }
+
+    .category-title {
+      font-size: clamp(1.3rem, 3vw, 1.9rem);
+      font-weight: 900;
+      color: var(--gold-light);
+      text-shadow: 0 0 20px rgba(201, 162, 39, 0.3);
+    }
+
+    .category-count {
+      margin-right: auto;
+      background: rgba(201, 162, 39, 0.12);
+      border: 1px solid var(--card-border);
+      border-radius: 30px;
+      padding: 4px 14px;
+      font-size: 0.82rem;
+      color: var(--gold-pale);
+      white-space: nowrap;
+    }
+
+    /* ============================
+       GROUP LABELS
+    ============================ */
+    .group-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--gold-pale);
+    }
+
+    .group-label-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to left, transparent, rgba(201, 162, 39, 0.35), transparent);
+    }
+
+    .group-label-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* ============================
+       CARDS GRID
+    ============================ */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    /* Top 3 special styling */
+    .contestant-card {
+      --border-color: #efa221;
+      --progress-color: var(--green-mid);
+      --badge-bg: #e0e0e0;
+      --badge-color: #555;
+    }
+
+    .contestant-card.rank-1 {
+      --border-color: #db8b00;
+      --progress-color: var(--green-mid);
+      --badge-bg: linear-gradient(135deg, #db8b00, #f8b500);
+      --badge-color: #000;
+    }
+
+    .contestant-card.rank-2 {
+      --border-color: #8da4b6;
+      --progress-color: var(--green-mid);
+      --badge-bg: linear-gradient(135deg, #7c94a7, #c1cdd8);
+      --badge-color: #000;
+    }
+
+    .contestant-card.rank-3 {
+      --border-color: #b97621;
+      --progress-color: #af6b12;
+      /* bronze/gold color for progress */
+      --badge-bg: linear-gradient(135deg, #c06925, #eaaa7c);
+      --badge-color: #000;
+    }
+
+    .contestant-card {
+      background: var(--off-white);
+      border-radius: 12px;
+      border-top: 5px solid var(--border-color);
+      padding: 30px 16px 22px;
+      text-align: center;
+      transition: transform var(--transition), box-shadow var(--transition);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .contestant-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      width: 100%;
+      margin-bottom: 12px;
+      margin-top: 4px;
+    }
+
+    .rank-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin: 0;
+      flex-shrink: 0;
+      background: var(--badge-bg);
+      color: var(--badge-color);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    .rank-badge svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .card-name {
+      font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+      font-weight: 800;
+      color: var(--green-darkest);
+      line-height: 1.4;
+      text-align: right;
+      flex: 1;
+      margin-right: 14px;
+    }
+
+    .score-circle {
+      position: relative;
+      width: 85px;
+      height: 85px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+      background: conic-gradient(var(--progress-color) calc(var(--score-pct) * 1%), #e6ede9 0);
+    }
+
+    .score-circle::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      background: var(--off-white);
+      border-radius: 50%;
+      z-index: 0;
+    }
+
+    .score-val {
+      position: relative;
+      z-index: 1;
+      font-size: 1.9rem;
+      font-weight: 900;
+      color: var(--progress-color);
+    }
+
+    .score-label {
+      font-size: 0.85rem;
+      color: #8c9692;
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+
+    .position-pill {
+      background: #e1faea;
+      color: var(--green-mid);
+      padding: 6px 24px;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      display: inline-block;
+    }
+
+    /* Grade cards specifically */
+    .contestant-card.grade-card {
+      padding: 20px 16px;
+      justify-content: center;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-top: 1px solid var(--card-border);
+      box-shadow: none;
+    }
+
+    .contestant-card.grade-card .card-name {
+      color: var(--white);
+      text-align: center;
+      margin: 10px 0;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .card-score {
+      font-size: 0.85rem;
+      color: var(--gold-pale);
+      background: rgba(201, 162, 39, 0.08);
+      border: 1px solid rgba(201, 162, 39, 0.2);
+      border-radius: 30px;
+      padding: 3px 12px;
+      display: inline-block;
+    }
+
+    /* Grades chip for non-ranked cards */
+
+    .grades-group .grade-chip {
+      display: inline-block;
+      padding: 3px 14px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .grade-chip.امتياز {
+      background: rgba(201, 162, 39, 0.2);
+      color: var(--gold-light);
+      border: 1px solid rgba(201, 162, 39, 0.4);
+    }
+
+    .grade-chip.جيد‌جدا,
+    .grade-chip.جيد_جدا {
+      background: rgba(60, 160, 80, 0.2);
+      color: #7ee09a;
+      border: 1px solid rgba(60, 160, 80, 0.35);
+    }
+
+    .grade-chip.جيد {
+      background: rgba(60, 120, 200, 0.18);
+      color: #8ab8ff;
+      border: 1px solid rgba(60, 120, 200, 0.35);
+    }
+
+    .grade-chip.مقبول {
+      background: rgba(160, 160, 160, 0.15);
+      color: #d0d0d0;
+      border: 1px solid rgba(160, 160, 160, 0.3);
+    }
+
+    /* ============================
+       GRADES TOGGLE SECTION
+    ============================ */
+    .grades-group {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.55s ease, opacity 0.4s ease;
+    }
+
+    .grades-group.visible {
+      max-height: 9999px;
+      opacity: 1;
+    }
+
+    .toggle-btn {
+      display: block;
+      margin: 10px auto 0;
+      padding: 11px 32px;
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      border-radius: 30px;
+      color: var(--gold-light);
+      font-family: 'Cairo', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), transform var(--transition), box-shadow var(--transition);
+      letter-spacing: 0.3px;
+    }
+
+    .toggle-btn:hover {
+      background: var(--gold);
+      color: var(--green-darkest);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(201, 162, 39, 0.35);
+    }
+
+    .toggle-btn:active {
+      transform: translateY(0);
+    }
+
+    /* hide button when no grades */
+    .toggle-btn:disabled {
+      display: none;
+    }
+
+    /* ============================
+       CATEGORY SEPARATOR
+    ============================ */
+    .category-separator {
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(201, 162, 39, 0.2), transparent);
+      margin: 20px 0 56px;
+    }
+
+    /* ============================
+       EMPTY STATE
+    ============================ */
+    .empty-cat {
+      text-align: center;
+      padding: 30px;
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 0.95rem;
+    }
+
+    /* ============================
+       FOOTER
+    ============================ */
+    .site-footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 32px 20px 24px;
+      border-top: 1px solid rgba(201, 162, 39, 0.15);
+      background: linear-gradient(0deg, rgba(10, 31, 14, 0.7) 0%, transparent 100%);
+    }
+
+    .footer-quran {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+
+    .footer-brand {
+      font-size: 0.88rem;
+      color: var(--gold-pale);
+      opacity: 0.75;
+    }
+
+    .footer-brand a {
+      color: var(--gold-light);
+      font-weight: 700;
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+
+    .footer-brand a:hover {
+      color: var(--white);
+      text-decoration: underline;
+    }
+
+    /* ============================
+       RESPONSIVE
+    ============================ */
+    @media (max-width: 640px) {
+      .site-header {
+        padding: 40px 16px 36px;
+      }
+
+      .cards-grid {
+        grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+        gap: 12px;
+      }
+
+      .contestant-card {
+        padding: 16px 12px 14px;
+      }
+
+      .category-count {
+        display: none;
+      }
+
+      .rank-badge {
+        width: 38px;
+        height: 38px;
+        font-size: 0.88rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .cards-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-badge">📖</div>
+    <h1>مسابقة خير زاد بمسجد عمار بن ياسر بالبلينا</h1>
+    <p class="subtitle">شرف الحفظ وعزة الصدور</p>
+    <div class="divider">
+      <span class="divider-line"></span>
+      <span class="divider-icon">✦</span>
+      <span class="divider-line"></span>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main id="main">
+    <div id="status-container">
+      <div class="spinner"></div>
+      <p>جارٍ تحميل النتائج…</p>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <p class="footer-quran">﴿ وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ ﴾</p>
+    <p class="footer-brand">تصميم وبرمجة: <a href="https://www.facebook.com/" target="_blank">ماهر عاطف</a> المبرمج</p>
+  </footer>
+
+  <script>
+    /* ============================================================
+       CONSTANTS
+    ============================================================ */
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzoJdbeUzQQrhfjEORVOIi-FrXCNNNEMb0K2xVvHAGW52EQpekz6KessiiierCi58U/exec';
+
+    const GRADE_VALUES = new Set(['امتياز', 'جيد جدا', 'جيد جدًا', 'جيد جداً', 'جيد', 'مقبول']);
+
+    /* ============================================================
+       HELPERS
+    ============================================================ */
+    function isGrade(rank) {
+      return GRADE_VALUES.has((rank || '').trim());
+    }
+
+    function getRankBadgeClass(rank) {
+      const r = String(rank).trim();
+      if (r === '1') return 'gold';
+      if (r === '2') return 'silver';
+      if (r === '3') return 'bronze';
+      return 'default';
+    }
+
+    function getCardRankClass(rank) {
+      const r = String(rank).trim();
+      if (r === '1') return 'rank-1';
+      if (r === '2') return 'rank-2';
+      if (r === '3') return 'rank-3';
+      return '';
+    }
+
+    function getRankLabel(rank) {
+      const r = String(rank).trim();
+      const ordinals = { '1': 'الأول', '2': 'الثاني', '3': 'الثالث', '4': 'الرابع', '5': 'الخامس' };
+      return ordinals[r] ? `المركز ${ordinals[r]}` : `المركز ${r}`;
+    }
+
+    function sanitize(str) {
+      return String(str || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* ============================================================
+       BUILD A SINGLE CONTESTANT CARD
+    ============================================================ */
+    function buildCard(contestant, isGradeGroup) {
+      const name = sanitize(contestant.name);
+      const score = sanitize(contestant.score);
+      const rank = sanitize(contestant.rank);
+
+      if (isGradeGroup) {
+        // Grades card
+        const gradeKey = rank.replace(/\s+/g, '_');
+        return `
+          <div class="contestant-card grade-card">
+            <span class="grade-chip ${gradeKey}">${rank}</span>
+            <p class="card-name">${name}</p>
+            <span class="card-score">الدرجة: ${score}</span>
+          </div>`;
+      } else {
+        // Ranked card
+        const cardClass = getCardRankClass(rank);
+
+        let iconHTML = `<div class="rank-badge">${rank}</div>`;
+        if (rank === '1') {
+          iconHTML = `
+             <div class="rank-badge">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                 <path d="M8 21h8m-4-4v4m0-4V7M7 3h10v4a5 5 0 0 1-10 0V3z"></path>
+                 <path d="M6 3H3v4c0 2.2 1.8 4 4 4v-8z"></path>
+                 <path d="M18 3h3v4c0 2.2-1.8 4-4 4v-8z"></path>
+               </svg>
+             </div>`;
+        } else if (rank === '2') {
+          iconHTML = `
+             <div class="rank-badge">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                 <circle cx="12" cy="8" r="7"></circle>
+                 <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+               </svg>
+             </div>`;
+        } else if (rank === '3') {
+          iconHTML = `
+             <div class="rank-badge">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                 <circle cx="12" cy="8" r="7"></circle>
+                 <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+               </svg>
+             </div>`;
+        }
+
+        const scoreVal = parseFloat(score) || 0;
+        const scorePct = Math.min(Math.max(scoreVal, 0), 100);
+
+        return `
+          <div class="contestant-card ranked-card ${cardClass}" style="--score-pct: ${scorePct};">
+            ${iconHTML}
+            <div class="card-top-row">
+              <p class="card-name">${name}</p>
+            </div>
+            <div class="score-circle">
+              <span class="score-val">${score}</span>
+            </div>
+            <p class="score-label">الدرجة</p>
+            <div class="position-pill">${getRankLabel(rank)}</div>
+          </div>`;
+      }
+    }
+
+    /* ============================================================
+       BUILD CATEGORY SECTION HTML
+    ============================================================ */
+    function buildCategorySection(categoryName, contestants, index) {
+      const ranked = contestants.filter(c => !isGrade(c.rank));
+      const graded = contestants.filter(c => isGrade(c.rank));
+
+      const hasRanked = ranked.length > 0;
+      const hasGraded = graded.length > 0;
+
+      const rankedCardsHTML = hasRanked
+        ? ranked.map(c => buildCard(c, false)).join('')
+        : `<p class="empty-cat">لا يوجد متسابقون في هذه الفئة.</p>`;
+
+      const gradedCardsHTML = hasGraded
+        ? graded.map(c => buildCard(c, true)).join('')
+        : '';
+
+      const toggleBtn = hasGraded
+        ? `<button class="toggle-btn" data-index="${index}" onclick="toggleGrades(this, ${index})">عرض باقي التقديرات</button>`
+        : '';
+
+      return `
+        <section class="category-section" style="animation-delay:${index * 0.08}s">
+          <div class="category-header">
+            <div class="category-icon">📚</div>
+            <h2 class="category-title">فئة ${sanitize(categoryName)}</h2>
+            <span class="category-count">${contestants.length} متسابق</span>
+          </div>
+
+          <!-- Top Ranks -->
+          <div class="group-label">
+            <span class="group-label-dot"></span>
+            <span>المراكز الأولى</span>
+            <span class="group-label-line"></span>
+          </div>
+          <div class="cards-grid ranks-group">
+            ${rankedCardsHTML}
+          </div>
+
+          ${hasGraded ? `
+          <!-- Grades (hidden by default) -->
+          <div class="grades-group" id="grades-${index}">
+            <div class="group-label" style="margin-top:8px;">
+              <span class="group-label-dot"></span>
+              <span>التقديرات</span>
+              <span class="group-label-line"></span>
+            </div>
+            <div class="cards-grid">${gradedCardsHTML}</div>
+          </div>
+          ` : ''}
+
+          ${toggleBtn}
+        </section>
+        <div class="category-separator"></div>
+      `;
+    }
+
+    /* ============================================================
+       TOGGLE GRADES
+    ============================================================ */
+    function toggleGrades(btn, index) {
+      const gradesDiv = document.getElementById(`grades-${index}`);
+      if (!gradesDiv) return;
+      const isVisible = gradesDiv.classList.contains('visible');
+      if (isVisible) {
+        gradesDiv.classList.remove('visible');
+        btn.textContent = 'عرض باقي التقديرات';
+      } else {
+        gradesDiv.classList.add('visible');
+        btn.textContent = 'إخفاء التقديرات';
+      }
+    }
+
+    /* ============================================================
+       FETCH AND RENDER
+    ============================================================ */
+    async function loadResults() {
+      const main = document.getElementById('main');
+      const status = document.getElementById('status-container');
+
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+        const data = await response.json();
+
+        // Get keys and REVERSE the order
+        const keys = Object.keys(data).reverse();
+
+        if (keys.length === 0) {
+          status.innerHTML = `<div class="error-box">لم يتم العثور على بيانات.</div>`;
+          return;
+        }
+
+        let html = '';
+        keys.forEach((cat, i) => {
+          html += buildCategorySection(cat, data[cat], i);
+        });
+
+        main.innerHTML = html;
+
+      } catch (err) {
+        console.error(err);
+        status.innerHTML = `
+          <div class="error-box">
+            ⚠️ تعذّر تحميل البيانات. يرجى التحقق من الاتصال بالإنترنت.<br/>
+            <small style="opacity:0.7; font-size:0.8rem;">${err.message}</small>
+          </div>`;
+      }
+    }
+
+    // Start
+    loadResults();
+  </script>
+</body>
+
+</html>
