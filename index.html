@@ -237,16 +237,7 @@
       text-shadow: 0 0 20px rgba(201, 162, 39, 0.3);
     }
 
-    .category-count {
-      margin-right: auto;
-      background: rgba(201, 162, 39, 0.12);
-      border: 1px solid var(--card-border);
-      border-radius: 30px;
-      padding: 4px 14px;
-      font-size: 0.82rem;
-      color: var(--gold-pale);
-      white-space: nowrap;
-    }
+
 
     /* ============================
        GROUP LABELS
@@ -337,7 +328,7 @@
     .card-top-row {
       display: flex;
       align-items: flex-start;
-      justify-content: flex-end;
+      justify-content: flex-start;
       width: 100%;
       margin-bottom: 12px;
       margin-top: 4px;
@@ -374,6 +365,7 @@
       text-align: right;
       flex: 1;
       margin-right: 14px;
+      margin-left: 48px;
     }
 
     .score-circle {
@@ -466,7 +458,8 @@
       margin-bottom: 8px;
     }
 
-    .grade-chip.امتياز {
+    .grade-chip.امتياز,
+    .grade-chip.أمتياز {
       background: rgba(201, 162, 39, 0.2);
       color: var(--gold-light);
       border: 1px solid rgba(201, 162, 39, 0.4);
@@ -667,7 +660,7 @@
     ============================================================ */
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoJdbeUzQQrhfjEORVOIi-FrXCNNNEMb0K2xVvHAGW52EQpekz6KessiiierCi58U/exec';
 
-    const GRADE_VALUES = new Set(['امتياز', 'جيد جدا', 'جيد جدًا', 'جيد جداً', 'جيد', 'مقبول']);
+    const GRADE_VALUES = new Set(['امتياز', 'أمتياز', 'جيد جدا', 'جيد جدًا', 'جيد جداً', 'جيد', 'مقبول']);
 
     /* ============================================================
        HELPERS
@@ -811,7 +804,6 @@
           <div class="category-header">
             <div class="category-icon">📚</div>
             <h2 class="category-title">فئة ${sanitize(categoryName)}</h2>
-            <span class="category-count">${contestants.length} متسابق</span>
           </div>
 
           <!-- Top Ranks -->
