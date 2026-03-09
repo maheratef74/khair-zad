@@ -484,6 +484,13 @@
       border: 1px solid rgba(160, 160, 160, 0.3);
     }
 
+    .grade-chip.جائزه_تشجيعية,
+    .grade-chip.جائزة_تشجيعية {
+      background: rgba(220, 140, 220, 0.15);
+      color: #ebadd8;
+      border: 1px solid rgba(220, 140, 220, 0.3);
+    }
+
     /* ============================
        GRADES TOGGLE SECTION
     ============================ */
@@ -648,7 +655,8 @@
   <!-- FOOTER -->
   <footer class="site-footer">
     <p class="footer-quran">﴿ وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ ﴾</p>
-    <p class="footer-brand">تم تطوير الموقع بواسطة: <a href="https://www.facebook.com/" target="_blank"> مهندس / ماهر
+    <p class="footer-brand">تم تطوير الموقع بواسطة: <a href="https://www.facebook.com/maher.atef.73080" target="_blank">
+        مهندس / ماهر
         عاطف اللبيدي </a><br>
       <span style="font-size: 1.5em; opacity: 0.9;"> 01205397285</span>
     </p>
@@ -660,7 +668,7 @@
     ============================================================ */
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoJdbeUzQQrhfjEORVOIi-FrXCNNNEMb0K2xVvHAGW52EQpekz6KessiiierCi58U/exec';
 
-    const GRADE_VALUES = new Set(['امتياز', 'أمتياز', 'جيد جدا', 'جيد جدًا', 'جيد جداً', 'جيد', 'مقبول']);
+    const GRADE_VALUES = new Set(['امتياز', 'أمتياز', 'جيد جدا', 'جيد جدًا', 'جيد جداً', 'جيد', 'مقبول', 'تشجيعيه', 'تشجيعية']);
 
     /* ============================================================
        HELPERS
@@ -706,7 +714,12 @@
     function buildCard(contestant, isGradeGroup) {
       const name = sanitize(contestant.name);
       const score = sanitize(contestant.score);
-      const rank = sanitize(contestant.rank);
+      let rank = sanitize(contestant.rank);
+      const note = sanitize(contestant.note);
+
+      if (note === 'تشجيعيه' || note === 'تشجيعية') {
+        rank = 'جائزة تشجيعية';
+      }
 
       const scoreVal = parseFloat(score) || 0;
       const scorePct = Math.min(Math.max(scoreVal, 0), 100);
